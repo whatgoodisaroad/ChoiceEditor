@@ -1,0 +1,45 @@
+start = blocks
+
+blocks = block*
+
+block = code / dim / choice
+
+name = cs:[A-Za-z]+ { return cs.join(""); }
+ws = " "*
+
+dim = 
+    "#dim " 
+    name:[A-Za-z]+ 
+    "<" 
+    tags:tags 
+    ">" { 
+        return {
+            type:"dim",
+            name:name.join(""),
+            tags:tags
+        }
+    }
+
+tags = n1:name ws "," ws n2:name { return [ n1, n2 ]; }
+
+code = c:[^#<>]+ { 
+        return {
+            type:"code",
+            code:c.join("") 
+        }; 
+    }
+
+choice = 
+    "#" 
+    name:[a-zA-Z]+ 
+    "<" 
+    choices:choices
+    ">" { 
+        return { 
+            type:"choice",
+            name:name.join(""), 
+            choices:choices 
+        };
+    }
+
+choices = bs1:blocks "#," bs2:blocks { return [ bs1, bs2 ]; }
